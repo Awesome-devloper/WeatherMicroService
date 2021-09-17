@@ -1,0 +1,68 @@
+version: '3.4'
+
+services:
+  registrationdb:
+    container_name: registrationdb
+    image: mongo:4.4.4
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data_user/registrationdb
+
+  registration.api: 
+    container_name: registration.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DatabaseSettings:ConnectionSetting=mongodb://registrationdb:27017
+    depends_on:
+      - registrationdb
+    ports:
+      - "8090:80"
+      - "8091:443"
+
+  rabbitmq:
+    image: rabbitmq:latest
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-admin}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-admin}
+    volumes:
+      - ./.docker/rabbitmq/etc/:/etc/rabbitmq/
+      - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
+      - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  login.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - rabbitmq
+    ports:
+      - "8092:80"
+      - "8093:443"
+
+
+  console.app:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - rabbitmq
+    ports:
+      - "8094:80"
+      - "8095:443"
+    volumes:
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  weather.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - registration.api
+    ports:
+      - "8096:80"
+      - "8097:443"
+    volumes:
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+  

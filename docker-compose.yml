@@ -1,0 +1,39 @@
+version: '3.4'
+
+services:
+  registrationdb:
+    image: mongo_registration
+  registration.api:
+    image: ${DOCKER_REGISTRY-}registrationapi
+    build:
+      context: .
+      dockerfile: src/Registration/Registration.Api/Dockerfile
+
+
+
+  login.api:
+    image: ${DOCKER_REGISTRY-}loginapi
+    build:
+      context: .
+      dockerfile: src/Login/Login.Api/Dockerfile
+
+  console.app:
+    image: ${DOCKER_REGISTRY-}consoleapp
+    build:
+      context: .
+      dockerfile: src/Console/Console.app/Dockerfile
+
+  weather.api:
+    image: ${DOCKER_REGISTRY-}weatherapi
+    build:
+      context: .
+      dockerfile: src/Weather/Weather.Api/Dockerfile
+
+  rabbitmq:
+    image: rabbitmq
+
+volumes:
+  mongo_data:
+
+
+
