@@ -27,7 +27,7 @@ namespace Weather.Api.Services
         {
             HttpClient http = new HttpClient();
 
-            var myApiKey = _configuration.GetSection("Apikey").Value4;
+            var myApiKey = _configuration.GetSection("Apikey").Value;
             try
             {
                 HttpResponseMessage client = await http.GetAsync($"http://api.openweathermap.org/data/2.5/weather?q={location}&appid={myApiKey}");
